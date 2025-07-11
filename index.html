@@ -1,21 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple HTML Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devora-Software | Tech Solutions</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="logo">
+      <img src="assets/logo.png" alt="Devora Logo">
+    </div>
+    <ul class="nav-links">
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="burger">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </nav>
+
+  <!-- Home Section -->
+  <section id="home" class="section">
+    <div class="hero">
+      <h1>Innovative Software Solutions</h1>
+      <p>Web | Mobile | AI | Robotics</p>
+      <a href="#contact" class="cta-btn">Get Started</a>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="section">
+    <h2 class="section-title">Our Services</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <img src="assets/web-icon.png" alt="Web Development">
+        <h3>Web Development</h3>
+        <p>React, Node.js, Django</p>
+      </div>
+      <!-- Add 3 more service cards -->
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="section">
+    <h2 class="section-title">Our Projects</h2>
+    <div class="projects-grid">
+      <div class="project-card">
+        <img src="assets/project1.jpg" alt="E-Commerce Platform">
+        <h3>E-Commerce Platform</h3>
+        <button class="details-btn">View Details</button>
+      </div>
+      <!-- Add 2 more project cards -->
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <h2 class="section-title">About Us</h2>
+    <div class="about-content">
+      <img src="assets/team.jpg" alt="Devora Team">
+      <div class="about-text">
+        <h3>Who We Are</h3>
+        <p>We're a team of passionate developers building future-ready software since 2023.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section">
+    <h2 class="section-title">Contact Us</h2>
+    <form id="contact-form">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <textarea id="message" placeholder="Your Project Details" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2023 Devora-Software. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
 </html>
