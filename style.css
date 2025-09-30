@@ -23,7 +23,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2%;
+  padding: 0.5rem 2%;
   padding-left: 1%;
   background: #001537;
   position: sticky;
@@ -38,7 +38,7 @@ body {
 
 .logo img {
   display: block;
-  width: 50px; /* desktop size */
+  width: 55px; /* desktop size */
   height: auto;
 }
 
