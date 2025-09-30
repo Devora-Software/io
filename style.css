@@ -23,11 +23,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 5%;
-  background: var(--dark);
+  padding: 1rem 2%;
+  padding-left: 1%;
+  background: #001537;
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  display: block;
+  width: 50px; /* desktop size */
+  height: auto;
 }
 
 .nav-links {
@@ -65,13 +77,41 @@ body {
 
 /* Home Section */
 #home {
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-              url('assets/hero-bg.jpg') center/cover;
+  position: relative;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+  overflow: hidden;
+  background-color: #000; /* black background behind the video to hide gaps */
+}
+
+/* Hero video - full bleed and cover */
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  will-change: transform; /* hint for smoother rendering */
+  backface-visibility: hidden;
+}
+
+/* Dark overlay on top of video for readability */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1;
+}
+
+/* Ensure hero content sits above video & overlay */
+.hero {
+  position: relative;
+  z-index: 2;
 }
 
 .hero h1 {
@@ -81,7 +121,7 @@ body {
 
 .cta-btn {
   display: inline-block;
-  background: var(--primary);
+  background: #0050ff;
   color: white;
   padding: 0.8rem 2rem;
   border-radius: 4px;
@@ -139,5 +179,14 @@ body {
 
   .hero h1 {
     font-size: 2rem;
+  }
+  
+  /* Smaller logo and reduced navbar padding on mobile */
+  .logo img {
+    width: 110px;
+  }
+
+  #navbar {
+    padding: 0.75rem 3%;
   }
 }
