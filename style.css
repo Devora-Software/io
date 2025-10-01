@@ -158,17 +158,7 @@ body {
   transform: translateY(-10px);
 }
 
-.service-keypoints::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    background: var(--primary);
-    border-radius: 2px;
-  }
+
 
 /* Services list — alternating rows */
 .services-list {
@@ -179,17 +169,7 @@ body {
     font-weight: 750;
   }
 
-  .service-subhead::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    background: var(--primary);
-    border-radius: 2px;
-  }
+
 
   /* Professional keypoints styling */
   .service-keypoints {
@@ -234,9 +214,76 @@ body {
   align-items: center;
   gap: 2rem;
   padding: 2rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(2,6,23,0.04);
+  box-shadow: 0 8px 24px rgba(2,6,23,0.06);
+  transition: transform 420ms cubic-bezier(.2,.9,.2,1), box-shadow 420ms ease, border-color 420ms ease;
+  will-change: transform, box-shadow;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle colored accent bar (left for left-rows, right for right-rows) */
+.service-row--left::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(180deg, #07a4ef, #eaf0f1);
+  transform: scaleY(1);
+  transition: transform 420ms ease, opacity 420ms ease;
+  opacity: 0.9;
+}
+.service-row--right::before { left: auto; right: 0; }
+
+/* Hover / focus animations */
+.service-row:hover,
+.service-row:focus-within {
+
+  box-shadow: 0 24px 48px rgba(2,6,23,0.12);
+  border-color: rgba(37,99,235,0.12);
+}
+
+.service-row:hover::before,
+.service-row:focus-within::before { transform: scaleY(1.03); opacity: 1; }
+
+/* Image treatment on hover */
+.service-row__media img {
+  transition: transform 540ms cubic-bezier(.2,.9,.2,1), filter 420ms ease;
+  will-change: transform, filter;
+}
+.service-row:hover .service-row__media img,
+.service-row:focus-within .service-row__media img {
+  transform: scale(1.04) translateY(-6px);
+  filter: brightness(1.03) saturate(1.03);
+}
+
+/* Content micro-animation */
+.service-row__content {
+  transition: transform 420ms cubic-bezier(.2,.9,.2,1), opacity 360ms ease;
+}
+.service-row:hover .service-row__content,
+.service-row:focus-within .service-row__content {
+  transform: translateY(-4px);
+}
+
+/* Focus ring for keyboard users */
+.service-row:focus-within {
+  outline: none;
+}
+.service-row:focus-within { box-shadow: 0 24px 48px rgba(37,99,235,0.12); }
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .service-row,
+  .service-row__media img,
+  .service-row__content {
+    transition: none !important;
+    transform: none !important;
+  }
 }
 
 .service-row__content h3 {
