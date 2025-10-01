@@ -152,13 +152,46 @@
   <!-- Projects Section -->
   <section id="projects" class="section">
     <h2 class="section-title">Our Projects</h2>
-    <div class="projects-grid">
-      <div class="project-card">
-        <img src="assets/project1.jpg" alt="E-Commerce Platform">
-        <h3>E-Commerce Platform</h3>
-        <button class="details-btn">View Details</button>
+
+    <div class="projects-carousel">
+      <div class="projects-track" id="projectsTrack">
+        <article class="project-card" data-index="0">
+          <img src="assets/image/kells-thum.png" alt="Keells Project Management System">
+          <div class="project-card__body">
+            <h3>Keells Project Management System</h3>
+            <p class="muted">We built a powerful, all-in-one management dashboard that gives businesses complete real-time control over their projects. This system automates tedious reporting, cuts operational costs, and ensures projects are delivered faster and more efficiently—turning chaos into clarity.</p>
+          </div>
+        </article>
+
+        <article class="project-card" data-index="1">
+          <img src="assets/image/Fit_Tracker_thum.png" alt="Fitness Tracker Mobile App">
+          <div class="project-card__body">
+            <h3>Fitness Tracker Mobile App</h3>
+            <p class="muted">We created a personal AI fitness coach that lives in your pocket. This intuitive app designs workouts that adapt to your progress, syncs seamlessly with your devices, and keeps you motivated daily, making it the only fitness partner you'll ever need.</p>
+          </div>
+        </article>
+
+        <article class="project-card" data-index="2">
+          <img src="assets/image/After-thum.png" alt="After You - Digital Legacy">
+          <div class="project-card__body">
+            <h3>After You - Digital Legacy</h3>
+            <p class="muted">We developed a secure and simple platform to protect your digital life. "After You" lets you safely manage and share important accounts and documents with loved ones, providing lasting peace of mind for what matters most.</p>
+          </div>
+        </article>
       </div>
-      <!-- Add 2 more project cards -->
+
+      <!-- Bold clickable points (titles) beneath the project cards -->
+      <div class="project-points" id="projectPoints" role="tablist" aria-label="Project list">
+        <button class="project-point" data-index="0" data-label="Keells Project Management System" role="tab">
+          <span class="sr-only">Keells Project Management System</span>
+        </button>
+        <button class="project-point" data-index="1" data-label="Fitness Tracker Mobile App" role="tab">
+          <span class="sr-only">Fitness Tracker Mobile App</span>
+        </button>
+        <button class="project-point" data-index="2" data-label="After You - Digital Legacy" role="tab">
+          <span class="sr-only">After You - Digital Legacy</span>
+        </button>
+      </div>
     </div>
   </section>
 

@@ -2,6 +2,9 @@
 const burger = document.querySelector('.burger');
 const navLinks = document.querySelector('.nav-links');
 
+// Mark that JS is running so CSS can apply JS-only reveal styles safely
+document.documentElement.classList.add('js');
+
 burger.addEventListener('click', () => {
   navLinks.classList.toggle('active');
   burger.classList.toggle('toggle');
@@ -116,4 +119,135 @@ window.addEventListener('scroll', () => {
   });
 
   imgs.forEach(img => observer.observe(img));
+})();
+
+/* Projects carousel: center cards when clicking points and allow keyboard navigation */
+(function(){
+  const track = document.getElementById('projectsTrack');
+  const cards = Array.from(document.querySelectorAll('.project-card'));
+  const points = Array.from(document.querySelectorAll('.project-point'));
+  if (!track || cards.length === 0 || points.length === 0) return;
+
+  let active = 0;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function updateClasses() {
+    cards.forEach((c, i) => {
+      c.classList.remove('is-left','is-center','is-right');
+      if (i === active) c.classList.add('is-center');
+      else if (i < active) c.classList.add('is-left');
+      else c.classList.add('is-right');
+    });
+
+    points.forEach((p,i) => p.setAttribute('aria-selected', i === active ? 'true' : 'false'));
+  }
+
+  function centerActive(instant=false) {
+    const containerWidth = track.parentElement.clientWidth;
+    const centerX = containerWidth / 2;
+    const activeCard = cards[active];
+    const cardRect = activeCard.getBoundingClientRect();
+    const trackRect = track.getBoundingClientRect();
+
+    // If measurements are zero (images not loaded), retry shortly
+    if (cardRect.width === 0 || trackRect.width === 0) {
+      setTimeout(() => centerActive(true), 80);
+      return;
+    }
+
+    // Calculate desired translate so active card center aligns with container center
+    const cardCenter = (cardRect.left - trackRect.left) + (cardRect.width / 2);
+    const translateX = centerX - cardCenter;
+
+    if (prefersReduced || instant) {
+      track.style.transition = 'none';
+    } else {
+      track.style.transition = '';
+    }
+    // Safety clamp: prevent absurd translate values that push the track fully out of view
+    // (this can happen if measurements are off or images haven't loaded yet)
+    const maxShift = Math.max(trackRect.width, containerWidth) * 1.2;
+    const clamped = Math.max(Math.min(translateX, maxShift), -maxShift);
+    // Use clamped value
+    track.style.transform = `translateX(${isFinite(clamped) ? clamped : 0}px)`;
+    // small timeout to clear inline transition if we turned it off
+    if (prefersReduced || instant) {
+      requestAnimationFrame(() => { track.style.transition = ''; });
+    }
+    updateClasses();
+  }
+
+  // Attach click handlers
+  points.forEach(p => {
+    p.addEventListener('click', (e) => {
+      const idx = Number(p.dataset.index);
+      if (isNaN(idx)) return;
+      active = idx;
+      centerActive();
+    });
+  });
+
+  // allow arrow navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') {
+      active = Math.min(cards.length - 1, active + 1);
+      centerActive();
+    } else if (e.key === 'ArrowLeft') {
+      active = Math.max(0, active - 1);
+      centerActive();
+    }
+  });
+
+  // initialize after images/layout settle
+  window.addEventListener('load', () => centerActive(true));
+  // also recenter on resize
+  window.addEventListener('resize', () => centerActive(true));
+
+  // Initial class setup
+  updateClasses();
+})();
+
+// Projects section reveal observer
+(function(){
+  const carousel = document.querySelector('.projects-carousel');
+  if (!carousel || !('IntersectionObserver' in window)) return;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (prefersReduced) {
+          carousel.classList.add('is-open');
+        } else {
+          carousel.classList.add('is-open');
+        }
+        // wait a tick for CSS to paint, then trigger a resize so centering recalculates
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
+      } else {
+        // allow replay when user scrolls away and back
+        // Do not remove .is-open here to avoid hiding content unexpectedly.
+        // We only want to animate once by default; stop observing after open below.
+      }
+    });
+  }, { root: null, threshold: 0.18 });
+
+  // Observe and also perform an immediate check in case the section is already visible
+  obs.observe(carousel);
+
+  function openIfVisible() {
+    const rect = carousel.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      carousel.classList.add('is-open');
+      // trigger recalc of centering
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
+      // we only need to open once
+      obs.unobserve(carousel);
+    }
+  }
+
+  // initial check now and also on load
+  openIfVisible();
+  window.addEventListener('load', openIfVisible);
 })();
