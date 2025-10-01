@@ -72,7 +72,8 @@ body {
 .section-title {
   text-align: center;
   margin-bottom: 3rem;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
+  color: #000;
 }
 
 /* Home Section */
@@ -155,8 +156,69 @@ body {
   transform: translateY(-10px);
 }
 
+.service-keypoints::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
 /* Services list — alternating rows */
 .services-list {
+  .service-subhead {
+    margin: 0 0 0.75rem 0;
+    color: #386abbde; /* slate-500 */
+    font-size: 1.1rem;
+    font-weight: 750;
+  }
+
+  .service-subhead::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  /* Professional keypoints styling */
+  .service-keypoints {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #475569; /* muted slate */
+    list-style: none; /* we'll add a custom marker */
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .service-keypoints li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.98rem;
+  }
+
+  .service-keypoints li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+  }
+
+  @media (max-width: 900px) {
+    .service-keypoints li { font-size: 0.95rem; }
+  }
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -176,20 +238,16 @@ body {
 }
 
 .service-row__content h3 {
-  font-size: 1.6rem;
+  font-size: 2.3rem;
   margin-bottom: 0.5rem;
-  color: var(--dark);
+  color: #052559;
 }
 
 .service-row__content p {
   margin-bottom: 1rem;
-  color: #334155;
-}
-
-.service-row__content ul {
-  list-style: disc inside;
-  color: #475569;
-  margin-left: 0.5rem;
+  color: #334155a3;
+  text-align: justify;
+  font-weight: 450;
 }
 
 .service-row__media img {
@@ -197,6 +255,29 @@ body {
   height: auto;
   display: block;
   border-radius: 8px;
+}
+
+/* Slide-up entrance animation for media */
+.service-row__media img {
+  transform: translateY(36px);
+  opacity: 0;
+  transition: transform 900ms cubic-bezier(.2,.9,.2,1), opacity 720ms ease;
+  will-change: transform, opacity;
+}
+
+.service-row__media img.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .service-row__media img,
+  .service-row__media img.is-visible {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
 }
 
 /* Variants: text left / text right */

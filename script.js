@@ -77,3 +77,43 @@ window.addEventListener('scroll', () => {
     navbar.style.boxShadow = 'none';
   }
 });
+
+// Service images entrance animation using IntersectionObserver
+(() => {
+  const imgs = document.querySelectorAll('.service-row__media img');
+  if (!('IntersectionObserver' in window) || imgs.length === 0) return;
+
+  // track pending timeouts so we can cancel when an element leaves quickly
+  const pending = new WeakMap();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const el = entry.target;
+      const idx = Array.from(imgs).indexOf(el);
+      const delay = (idx % 6) * 160; // slower stagger (160ms per index)
+
+      if (entry.isIntersecting) {
+        // schedule reveal
+        if (pending.has(el)) return; // already scheduled
+        const t = setTimeout(() => {
+          el.classList.add('is-visible');
+          pending.delete(el);
+        }, delay);
+        pending.set(el, t);
+      } else {
+        // element left viewport: cancel any pending reveal and remove class so it can replay
+        if (pending.has(el)) {
+          clearTimeout(pending.get(el));
+          pending.delete(el);
+        }
+        el.classList.remove('is-visible');
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '0px 0px -10% 0px',
+    threshold: 0.12
+  });
+
+  imgs.forEach(img => observer.observe(img));
+})();
