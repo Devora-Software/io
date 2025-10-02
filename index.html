@@ -261,23 +261,31 @@
     <div class="contact-grid">
       <div class="contact-form-wrap">
         <form id="contact-form" class="contact-form" novalidate>
+          <div class="form-messages" id="form-messages" aria-live="polite"></div>
+        
           <div class="form-row">
             <label for="name" class="sr-only">Name</label>
             <input type="text" id="name" name="name" placeholder="Your full name" required>
+            <span class="field-error" id="name-error"></span>
           </div>
 
           <div class="form-row">
             <label for="email" class="sr-only">Email</label>
             <input type="email" id="email" name="email" placeholder="you@company.com" required>
+            <span class="field-error" id="email-error"></span>
           </div>
 
           <div class="form-row">
             <label for="message" class="sr-only">Message</label>
             <textarea id="message" name="message" rows="6" placeholder="Briefly tell us about your project" required></textarea>
+            <span class="field-error" id="message-error"></span>
           </div>
 
           <div class="form-row form-row--actions">
-            <button type="submit" class="btn btn-primary">Send Message</button>
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+              <span class="btn-text">Send Message</span>
+              <span class="btn-loading" style="display: none;">Sending...</span>
+            </button>
             <div class="contact-form-note">We typically reply within 1-2 business days.</div>
           </div>
         </form>
@@ -289,7 +297,7 @@
           <p class="muted">Tell us about your idea and we'll suggest the best path forward — whether that's a prototype, a full product, or ongoing engineering support.</p>
 
           <ul class="info-list">
-            <li><strong>Email:</strong> <a href="contact.devora.team@gmail.com">contact.devora.team@gmail.com</a></li>
+            <li><strong>Email:</strong> <a href="mailto:contact.devora.team@gmail.com">contact.devora.team@gmail.com</a></li>
             <li><strong>Phone:</strong> <a href="tel:+94781566735">+9478 15 66 735</a></li>
             <li><strong>Location:</strong> Remote-first — ships globally</li>
           </ul>
@@ -308,16 +316,21 @@
       <p class="footer-copy">&copy; 2023 Devora-Software. All rights reserved.</p>
 
       <div class="footer-social" aria-label="Follow us on social media">
-        <picture class="social-icon">
-          <source srcset="assets/image/facebook-icon.png" type="image/png">
-          <img src="assets/image/facebook-icon.svg" alt="Facebook" loading="lazy" href="https://web.facebook.com/profile.php?id=61581114640610">
-        </picture>
+        <a class="social-link" href="https://web.facebook.com/profile.php?id=61581114640610" target="_blank" rel="noopener noreferrer" aria-label="Visit our Facebook page">
+          <picture class="social-icon">
+            <source srcset="assets/image/facebook-icon.png" type="image/png">
+            <img src="assets/image/facebook-icon.svg" alt="Facebook" loading="lazy">
+          </picture>
+        </a>
 
-        <picture class="social-icon">
-          <source srcset="assets/image/instagram-icon.png" type="image/png">
-          <img src="assets/image/instagram-icon.svg" alt="Instagram" loading="lazy" href="https://www.instagram.com/official_devora/">
-        </picture>
+        <a class="social-link" href="https://www.instagram.com/official_devora/" target="_blank" rel="noopener noreferrer" aria-label="Visit our Instagram page">
+          <picture class="social-icon">
+            <source srcset="assets/image/instagram-icon.png" type="image/png">
+            <img src="assets/image/instagram-icon.svg" alt="Instagram" loading="lazy">
+          </picture>
+        </a>
       </div>
+
     </div>
   </footer>
 

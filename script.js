@@ -27,50 +27,137 @@ document.querySelectorAll('nav a').forEach(anchor => {
 });
 
 // Form Validation with success micro-animation
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-  contactForm.addEventListener('submit', function(e) {
-    e.preventDefault();
+// Contact form handling
+(function() {
+  const contactForm = document.getElementById('contact-form');
+  const formMessages = document.getElementById('form-messages');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText = submitBtn.querySelector('.btn-text');
+  const btnLoading = submitBtn.querySelector('.btn-loading');
 
-    const name = document.getElementById('name');
-    const email = document.getElementById('email');
-    const message = document.getElementById('message');
-    let isValid = true;
+  if (!contactForm) return;
 
-    // Simple validation
-    if (name.value.trim() === '') {
-      alert('Name is required');
-      isValid = false;
+  function showMessage(message, type) {
+    formMessages.innerHTML = `<div class="message ${type}">${message}</div>`;
+    formMessages.style.display = 'block';
+    
+    // Scroll to message
+    formMessages.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Auto-hide success messages after 8 seconds
+    if (type === 'success') {
+      setTimeout(() => {
+        formMessages.style.display = 'none';
+      }, 8000);
     }
+  }
 
-    if (!/^\S+@\S+\.\S+$/.test(email.value)) {
-      alert('Please enter a valid email');
-      isValid = false;
+  function setLoading(state) {
+    if (state) {
+      btnText.style.display = 'none';
+      btnLoading.style.display = 'inline';
+      submitBtn.disabled = true;
+    } else {
+      btnText.style.display = 'inline';
+      btnLoading.style.display = 'none';
+      submitBtn.disabled = false;
     }
+  }
 
-    if (message.value.trim() === '') {
-      alert('Message is required');
-      isValid = false;
+  function validateForm(formData) {
+    const errors = {};
+    
+    if (!formData.get('name')?.trim()) {
+      errors.name = 'Name is required';
     }
+    
+    if (!formData.get('email')?.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.get('email'))) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.get('message')?.trim()) {
+      errors.message = 'Message is required';
+    }
+    
+    return errors;
+  }
 
-    if (isValid) {
-      // success micro-animation: add a class, then reset after a short delay
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReduced) {
-        alert('Message sent successfully!');
-        this.reset();
+  async function submitForm(formData) {
+    // ✅ REPLACE THIS WITH YOUR ACTUAL FORMSPREE URL
+    const formspreeEndpoint = 'https://formspree.io/f/xvgwrbda';
+    
+    try {
+      const response = await fetch(formspreeEndpoint, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        return { success: true };
       } else {
-        this.classList.add('is-submitted');
-        // duration matches CSS animation (we'll keep 900ms)
-        setTimeout(() => {
-          this.classList.remove('is-submitted');
-          alert('Message sent successfully!');
-          this.reset();
-        }, 900);
+        return { 
+          success: false, 
+          error: 'Failed to send message. Please try again later.' 
+        };
       }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: 'Network error. Please check your connection and try again.' 
+      };
+    }
+  }
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(contactForm);
+    const errors = validateForm(formData);
+    
+    // Clear previous errors and messages
+    document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+    formMessages.style.display = 'none';
+    
+    if (Object.keys(errors).length > 0) {
+      // Show field errors
+      Object.entries(errors).forEach(([field, error]) => {
+        const errorEl = document.getElementById(`${field}-error`);
+        if (errorEl) errorEl.textContent = error;
+      });
+      showMessage('Please fix the errors above', 'error');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const result = await submitForm(formData);
+      
+      if (result.success) {
+        showMessage('✅ Thank you! Your message has been sent successfully. We\'ll get back to you within 1-2 business days.', 'success');
+        contactForm.reset();
+      } else {
+        showMessage(`❌ ${result.error}`, 'error');
+      }
+    } catch (error) {
+      showMessage('❌ An unexpected error occurred. Please try again.', 'error');
+    } finally {
+      setLoading(false);
     }
   });
-}
+
+  // Real-time validation - clear errors when user types
+  contactForm.addEventListener('input', (e) => {
+    const field = e.target.name;
+    const errorEl = document.getElementById(`${field}-error`);
+    if (errorEl) errorEl.textContent = '';
+  });
+})();
 
 // Project Details Modal
 const detailBtns = document.querySelectorAll('.details-btn');
@@ -225,45 +312,63 @@ window.addEventListener('scroll', () => {
   }
 
   function updateClasses() {
-    cards.forEach((c, i) => {
-      c.classList.remove('is-left','is-center','is-right');
-      if (i === active) c.classList.add('is-center');
-      else if (i < active) c.classList.add('is-left');
-      else c.classList.add('is-right');
-    });
-
-    // map aria-selected to logical index (modulo original count)
-    const logicalActive = active % origCount;
-    points.forEach((p,i) => p.setAttribute('aria-selected', i === logicalActive ? 'true' : 'false'));
-  }
-
-  function centerActive(instant=false) {
-    const containerWidth = track.parentElement.clientWidth;
-    const centerX = containerWidth / 2;
-    // clamp active to available cards indexes to avoid undefined access
-    const idx = Math.max(0, Math.min(active, cards.length - 1));
-    const activeCard = cards[idx];
-    const cardRect = activeCard.getBoundingClientRect();
-    const trackRect = track.getBoundingClientRect();
-
-    if (cardRect.width === 0 || trackRect.width === 0) {
-      setTimeout(() => centerActive(true), 80);
-      return;
+  cards.forEach((card, index) => {
+    card.classList.remove('is-left', 'is-center', 'is-right');
+    
+    if (index === active) {
+      card.classList.add('is-center');
+    } else if (index < active) {
+      card.classList.add('is-left');
+    } else {
+      card.classList.add('is-right');
     }
+  });
+  
+  // Update navigation points
+  const logicalActive = active % origCount;
+  points.forEach((point, i) => {
+    point.setAttribute('aria-selected', i === logicalActive ? 'true' : 'false');
+  });
+}
 
-    const cardCenter = (cardRect.left - trackRect.left) + (cardRect.width / 2);
-    const translateX = centerX - cardCenter;
-
-    if (prefersReduced || instant) track.style.transition = 'none';
-    else track.style.transition = '';
-
-    const maxShift = Math.max(trackRect.width, containerWidth) * 1.2;
-    const clamped = Math.max(Math.min(translateX, maxShift), -maxShift);
-    track.style.transform = `translateX(${isFinite(clamped) ? clamped : 0}px)`;
-
-    if (prefersReduced || instant) requestAnimationFrame(() => { track.style.transition = ''; });
-    updateClasses();
+  function centerActive(instant = false) {
+  if (cards.length === 0) return;
+  
+  const container = track.parentElement;
+  const containerWidth = container.clientWidth;
+  const centerX = containerWidth / 2;
+  
+  // Clamp active to available cards indexes
+  const idx = Math.max(0, Math.min(active, cards.length - 1));
+  const activeCard = cards[idx];
+  
+  // Get positions relative to track
+  const trackRect = track.getBoundingClientRect();
+  const cardRect = activeCard.getBoundingClientRect();
+  
+  // Calculate the position needed to center the active card
+  const cardCenterInTrack = (cardRect.left - trackRect.left) + (cardRect.width / 2);
+  const translateX = centerX - cardCenterInTrack;
+  
+  // Apply transition
+  if (prefersReduced || instant) {
+    track.style.transition = 'none';
+  } else {
+    track.style.transition = '';
   }
+  
+  // Apply transform
+  track.style.transform = `translateX(${translateX}px)`;
+  
+  // Reset transition if needed
+  if (prefersReduced || instant) {
+    requestAnimationFrame(() => {
+      track.style.transition = '';
+    });
+  }
+  
+  updateClasses();
+}
 
   // Attach click handlers (map to logical index)
   points.forEach(p => {
