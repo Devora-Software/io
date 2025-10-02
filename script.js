@@ -26,36 +26,48 @@ document.querySelectorAll('nav a').forEach(anchor => {
   });
 });
 
-// Form Validation
+// Form Validation with success micro-animation
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
   contactForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const name = document.getElementById('name');
     const email = document.getElementById('email');
     const message = document.getElementById('message');
     let isValid = true;
-    
+
     // Simple validation
     if (name.value.trim() === '') {
       alert('Name is required');
       isValid = false;
     }
-    
+
     if (!/^\S+@\S+\.\S+$/.test(email.value)) {
       alert('Please enter a valid email');
       isValid = false;
     }
-    
+
     if (message.value.trim() === '') {
       alert('Message is required');
       isValid = false;
     }
-    
+
     if (isValid) {
-      alert('Message sent successfully!');
-      this.reset();
+      // success micro-animation: add a class, then reset after a short delay
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) {
+        alert('Message sent successfully!');
+        this.reset();
+      } else {
+        this.classList.add('is-submitted');
+        // duration matches CSS animation (we'll keep 900ms)
+        setTimeout(() => {
+          this.classList.remove('is-submitted');
+          alert('Message sent successfully!');
+          this.reset();
+        }, 900);
+      }
     }
   });
 }
@@ -121,16 +133,96 @@ window.addEventListener('scroll', () => {
   imgs.forEach(img => observer.observe(img));
 })();
 
+// Services section reveal (replay on scroll)
+(function(){
+  const services = document.querySelector('#services');
+  if (!services || !('IntersectionObserver' in window)) return;
+
+  const list = services.querySelector('.services-list');
+  if (!list) return;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) { list.classList.add('is-revealed'); return; }
+
+  const sio = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        list.classList.add('is-revealed');
+      } else {
+        list.classList.remove('is-revealed');
+      }
+    });
+  }, { root: null, threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+  sio.observe(services);
+})();
+
 /* Projects carousel: center cards when clicking points and allow keyboard navigation */
 (function(){
   const track = document.getElementById('projectsTrack');
-  const cards = Array.from(document.querySelectorAll('.project-card'));
+  let cards = Array.from(document.querySelectorAll('.project-card'));
   const points = Array.from(document.querySelectorAll('.project-point'));
   if (!track || cards.length === 0 || points.length === 0) return;
 
-  let active = 0;
+  // Create a forward-only ring by cloning the original set and appending them
+  const origCount = cards.length;
+  if (origCount > 1) {
+    const frag = document.createDocumentFragment();
+    cards.forEach(c => frag.appendChild(c.cloneNode(true)));
+    track.appendChild(frag);
+    cards = Array.from(track.querySelectorAll('.project-card'));
+  }
+
+  let active = 0; // index into `cards` (can grow into the cloned range)
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Auto-rotate settings
+  const AUTO_CENTER_PAUSE = 5000; // ms to keep a card centered before moving on
+  let autoTimer = null;
+  // Approximate transition duration used for fallback snapping when wrapping
+  const TRANSITION_MS = 620;
+  let snapFallbackTimer = null;
+
+  function stopAuto() {
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  }
+
+  function startAuto() {
+    if (prefersReduced) return; // respect user's motion preference
+    stopAuto();
+    autoTimer = setTimeout(autoStep, AUTO_CENTER_PAUSE);
+  }
+
+  function resetAuto() {
+    stopAuto();
+    autoTimer = setTimeout(autoStep, AUTO_CENTER_PAUSE);
+  }
+
+  function autoStep() {
+    if (cards.length === 0) return;
+    // always advance forward (left -> right). We allow active to enter the cloned range.
+    active = active + 1;
+    centerActive();
+    stopAuto();
+    autoTimer = setTimeout(autoStep, AUTO_CENTER_PAUSE);
+
+    // If we've advanced into the cloned region, ensure a fallback snap will restore
+    // the logical index in case the transitionend event doesn't fire for any reason.
+    if (origCount > 1 && active >= origCount) {
+      if (snapFallbackTimer) clearTimeout(snapFallbackTimer);
+      snapFallbackTimer = setTimeout(() => {
+        if (active >= origCount) {
+          const logical = active % origCount;
+          active = logical;
+          // snap without transition
+          centerActive(true);
+          updateClasses();
+          startAuto();
+        }
+      }, TRANSITION_MS + 120);
+    }
+  }
 
   function updateClasses() {
     cards.forEach((c, i) => {
@@ -140,116 +232,144 @@ window.addEventListener('scroll', () => {
       else c.classList.add('is-right');
     });
 
-    points.forEach((p,i) => p.setAttribute('aria-selected', i === active ? 'true' : 'false'));
+    // map aria-selected to logical index (modulo original count)
+    const logicalActive = active % origCount;
+    points.forEach((p,i) => p.setAttribute('aria-selected', i === logicalActive ? 'true' : 'false'));
   }
 
   function centerActive(instant=false) {
     const containerWidth = track.parentElement.clientWidth;
     const centerX = containerWidth / 2;
-    const activeCard = cards[active];
+    // clamp active to available cards indexes to avoid undefined access
+    const idx = Math.max(0, Math.min(active, cards.length - 1));
+    const activeCard = cards[idx];
     const cardRect = activeCard.getBoundingClientRect();
     const trackRect = track.getBoundingClientRect();
 
-    // If measurements are zero (images not loaded), retry shortly
     if (cardRect.width === 0 || trackRect.width === 0) {
       setTimeout(() => centerActive(true), 80);
       return;
     }
 
-    // Calculate desired translate so active card center aligns with container center
     const cardCenter = (cardRect.left - trackRect.left) + (cardRect.width / 2);
     const translateX = centerX - cardCenter;
 
-    if (prefersReduced || instant) {
-      track.style.transition = 'none';
-    } else {
-      track.style.transition = '';
-    }
-    // Safety clamp: prevent absurd translate values that push the track fully out of view
-    // (this can happen if measurements are off or images haven't loaded yet)
+    if (prefersReduced || instant) track.style.transition = 'none';
+    else track.style.transition = '';
+
     const maxShift = Math.max(trackRect.width, containerWidth) * 1.2;
     const clamped = Math.max(Math.min(translateX, maxShift), -maxShift);
-    // Use clamped value
     track.style.transform = `translateX(${isFinite(clamped) ? clamped : 0}px)`;
-    // small timeout to clear inline transition if we turned it off
-    if (prefersReduced || instant) {
-      requestAnimationFrame(() => { track.style.transition = ''; });
-    }
+
+    if (prefersReduced || instant) requestAnimationFrame(() => { track.style.transition = ''; });
     updateClasses();
   }
 
-  // Attach click handlers
+  // Attach click handlers (map to logical index)
   points.forEach(p => {
     p.addEventListener('click', (e) => {
       const idx = Number(p.dataset.index);
       if (isNaN(idx)) return;
+      // set to the primary index (first set)
       active = idx;
       centerActive();
+      resetAuto();
     });
   });
 
-  // allow arrow navigation
+  // allow arrow navigation (operate on logical indices)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') {
-      active = Math.min(cards.length - 1, active + 1);
+      const logical = (active % origCount + 1) % origCount;
+      active = logical;
       centerActive();
+      resetAuto();
     } else if (e.key === 'ArrowLeft') {
-      active = Math.max(0, active - 1);
+      const logical = (active % origCount - 1 + origCount) % origCount;
+      active = logical;
       centerActive();
+      resetAuto();
     }
   });
 
   // initialize after images/layout settle
-  window.addEventListener('load', () => centerActive(true));
-  // also recenter on resize
+  window.addEventListener('load', () => { centerActive(true); startAuto(); });
   window.addEventListener('resize', () => centerActive(true));
+
+  // Pause auto-rotate when the page/tab is not visible to save resources
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAuto();
+    else startAuto();
+  });
 
   // Initial class setup
   updateClasses();
+
+  // If we cloned originals, snap-back after transitioning into clones to maintain seamless ring
+  if (origCount > 1) {
+    track.addEventListener('transitionend', (ev) => {
+      if (ev.propertyName !== 'transform') return;
+      // clear any pending fallback snap since transition did fire
+      if (snapFallbackTimer) { clearTimeout(snapFallbackTimer); snapFallbackTimer = null; }
+
+      // if we've moved into the cloned region (active >= origCount), snap back to logical index
+      if (active >= origCount) {
+        const logical = active % origCount;
+        active = logical;
+        // snap without transition
+        centerActive(true);
+        updateClasses();
+        // ensure auto continues
+        startAuto();
+      }
+    });
+  }
 })();
 
-// Projects section reveal observer
+// Projects section reveal observer — toggle .is-revealed on enter/exit so cards replay
 (function(){
   const carousel = document.querySelector('.projects-carousel');
   if (!carousel || !('IntersectionObserver' in window)) return;
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        if (prefersReduced) {
-          carousel.classList.add('is-open');
-        } else {
-          carousel.classList.add('is-open');
-        }
-        // wait a tick for CSS to paint, then trigger a resize so centering recalculates
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
-      } else {
-        // allow replay when user scrolls away and back
-        // Do not remove .is-open here to avoid hiding content unexpectedly.
-        // We only want to animate once by default; stop observing after open below.
-      }
-    });
-  }, { root: null, threshold: 0.18 });
-
-  // Observe and also perform an immediate check in case the section is already visible
-  obs.observe(carousel);
-
-  function openIfVisible() {
-    const rect = carousel.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      carousel.classList.add('is-open');
-      // trigger recalc of centering
-      setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
-      // we only need to open once
-      obs.unobserve(carousel);
-    }
+  if (prefersReduced) {
+    carousel.classList.add('is-open');
+    carousel.classList.add('is-revealed');
+    return;
   }
 
-  // initial check now and also on load
-  openIfVisible();
-  window.addEventListener('load', openIfVisible);
+  const projObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        carousel.classList.add('is-open', 'is-revealed');
+        // allow layout to settle then recenter
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
+      } else {
+        // remove reveal so animations can replay on next enter
+        carousel.classList.remove('is-revealed');
+      }
+    });
+  }, { root: null, threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+
+  projObserver.observe(carousel);
+
+  // also perform an immediate visibility check (in case it's already on-screen)
+  (function immediate() {
+    const rect = carousel.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      carousel.classList.add('is-open', 'is-revealed');
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
+    }
+  })();
+
+  window.addEventListener('load', () => {
+    const rect = carousel.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      carousel.classList.add('is-open', 'is-revealed');
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
+    }
+  });
 })();
 
 // About section reveal + stats (replay on every scroll into view)
@@ -327,3 +447,63 @@ window.addEventListener('scroll', () => {
 
   io.observe(about);
 })();
+
+  // Defensive visibility check (fallback) — ensures reveal classes are added when observers fail or timings are off
+  (function(){
+    const items = [
+      { rootSel: '#projects', childSel: '.projects-carousel' },
+      { rootSel: '#contact', childSel: '.contact-section' },
+      { rootSel: '#services', childSel: '.services-list' },
+      { rootSel: '#about', childSel: '.about-section' }
+    ];
+
+    function isVisible(rect){ return rect.top < window.innerHeight && rect.bottom > 0; }
+
+    function clampProjectTrack(){
+      const track = document.getElementById('projectsTrack');
+      if (!track || !track.parentElement) return;
+      const style = window.getComputedStyle(track);
+      const matrix = style.transform;
+      if (!matrix || matrix === 'none') return;
+      // try to extract translateX from matrix(...) or matrix3d(...)
+      const m = matrix.match(/matrix\(([-0-9eE\.\,\s]+)\)/);
+      const m3 = matrix.match(/matrix3d\(([-0-9eE\.\,\s]+)\)/);
+      let tx = 0;
+      if (m3) {
+        const parts = m3[1].split(',').map(s => parseFloat(s.trim()));
+        tx = parts[12] || 0; // tx in matrix3d is 13th value (index 12)
+      } else if (m) {
+        const parts = m[1].split(',').map(s => parseFloat(s.trim()));
+        tx = parts[4] || 0; // tx in 2d matrix is 5th value (index 4)
+      }
+      if (!isFinite(tx)) return;
+      const trackRect = track.getBoundingClientRect();
+      const parentRect = track.parentElement.getBoundingClientRect();
+      const maxShift = Math.max(trackRect.width, parentRect.width) * 1.5;
+      if (Math.abs(tx) > maxShift) {
+        track.style.transform = 'translateX(0px)';
+      }
+    }
+
+    function checkVisibility(){
+      items.forEach(it => {
+        const root = document.querySelector(it.rootSel);
+        if (!root) return;
+        const child = it.childSel ? root.querySelector(it.childSel) || root : root;
+        const rect = root.getBoundingClientRect();
+        if (isVisible(rect)) {
+          child.classList.add('is-revealed');
+          // also ensure projects get is-open
+          if (it.rootSel === '#projects') child.classList.add('is-open');
+        } else {
+          child.classList.remove('is-revealed');
+        }
+      });
+      clampProjectTrack();
+    }
+
+    let t = null;
+    window.addEventListener('load', checkVisibility);
+    window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(checkVisibility, 120); });
+    window.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(checkVisibility, 120); });
+  })();
