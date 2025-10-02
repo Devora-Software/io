@@ -251,3 +251,79 @@ window.addEventListener('scroll', () => {
   openIfVisible();
   window.addEventListener('load', openIfVisible);
 })();
+
+// About section reveal + stats (replay on every scroll into view)
+(function(){
+  const about = document.querySelector('.about-section');
+  if (!about || !('IntersectionObserver' in window)) return;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Numeric animator (supports decimals and suffixes)
+  function animateCounter(el, to, duration = 900, decimals = 0, suffix = '') {
+    if (prefersReduced) { el.textContent = String(to) + suffix; return; }
+    const start = performance.now();
+    const from = 0;
+    function tick(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = from + (to - from) * eased;
+      const formatted = decimals > 0 ? current.toFixed(decimals) : String(Math.floor(current));
+      el.textContent = formatted + suffix;
+      if (t < 1) requestAnimationFrame(tick);
+      else { el.textContent = (decimals > 0 ? Number(to).toFixed(decimals) : String(Math.floor(to))) + suffix; }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Start stat animations from 0; uses data-final to persist original value
+  function startStats() {
+    const statVals = about.querySelectorAll('.stat-value');
+    if (!statVals || statVals.length === 0) return;
+
+    statVals.forEach((sv, idx) => {
+      const raw = sv.getAttribute('data-final') || sv.textContent.trim();
+      const match = raw.match(/^([0-9][0-9,\.]*)?(.*)$/);
+      if (!match) return;
+      const numPart = match[1] || '0';
+      const suffix = match[2] || '';
+      const normalized = numPart.replace(/,/g, '');
+      const num = parseFloat(normalized);
+      if (Number.isNaN(num)) return;
+      const decimals = (normalized.split('.')[1] || '').length;
+
+      sv.textContent = '0' + suffix;
+      setTimeout(() => animateCounter(sv, num, 900 + (idx * 120), decimals, suffix), idx * 120);
+    });
+  }
+
+  // Persist final values so they can be re-read between runs
+  about.querySelectorAll('.stat-value').forEach(sv => {
+    if (!sv.getAttribute('data-final')) sv.setAttribute('data-final', sv.textContent.trim());
+  });
+
+  if (prefersReduced) {
+    about.classList.add('is-revealed');
+    startStats();
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        about.classList.add('is-revealed');
+        startStats();
+      } else {
+        // remove reveal so animations can replay on next enter
+        about.classList.remove('is-revealed');
+        // restore final values so the section looks correct while off-screen
+        about.querySelectorAll('.stat-value').forEach(sv => {
+          const f = sv.getAttribute('data-final');
+          if (f) sv.textContent = f;
+        });
+      }
+    });
+  }, { root: null, threshold: 0.18, rootMargin: '0px 0px -10% 0px' });
+
+  io.observe(about);
+})();
