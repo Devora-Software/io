@@ -1015,8 +1015,20 @@ body {
   box-shadow: 0 8px 20px rgba(2,6,23,0.04); 
 }
 
-.stat-value { font-size: 1.9rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em; }
-.stat-label { font-size: 0.78rem; color: #64748b; margin-top: 0.35rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.stat-value { 
+  font-size: 1.9rem; 
+  font-weight: 800; 
+  color: var(--primary); 
+  letter-spacing: -0.02em; 
+}
+
+.stat-label { 
+  font-size: 0.78rem; 
+  color: #64748b; 
+  margin-top: 0.35rem; 
+  text-transform: uppercase; 
+  letter-spacing: 0.08em; 
+}
 
 /* Responsive adjustments */
 @media (max-width: 980px) {
@@ -1098,6 +1110,76 @@ body {
   .about-section.is-revealed .about-intro,
   .about-section.is-revealed .about-card,
   .about-section.is-revealed .about-stats { animation: none !important; }
+}
+
+/* Tablet Styles (768px) for About Section */
+@media screen and (max-width: 768px) {
+  .about-section {
+    padding: 3rem 0 2.5rem 0;
+  }
+  
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 0 1.5rem;
+  }
+  
+  .about-intro h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+  
+  .about-intro .lead {
+    font-size: 1rem;
+    text-align: justify;
+    margin-bottom: 1rem;
+  }
+  
+  .about-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .about-card {
+    padding: 1rem 1rem;
+  }
+  
+  .about-card h4 {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  
+  .about-card p {
+    font-size: 0.95rem;
+    text-align: justify;
+  }
+  
+  .about-stats {
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+  }
+  
+  .stat {
+    padding: 0.85rem 0.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1.6rem;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
+  }
+  
+  .about-intro .cta-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    display: block;
+    text-align: center;
+    margin: 1rem auto 0 auto;
+    width: fit-content;
+  }
 }
 
 /* Contact section styles */
@@ -1443,4 +1525,80 @@ body {
   }
 }
 
-
+/* Tablet Styles (768px) for Contact Section */
+@media screen and (max-width: 768px) {
+  .contact-section {
+    padding-top: 2.5rem;
+    padding-bottom: 3.5rem;
+  }
+  
+  .contact-section::before {
+    right: -15%;
+    top: -8%;
+    width: 300px;
+    height: 300px;
+    filter: blur(28px);
+  }
+  
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 0 1.5rem;
+  }
+  
+  .contact-form {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .contact-form input[type="text"],
+  .contact-form input[type="email"],
+  .contact-form textarea {
+    padding: 0.85rem 0.9rem;
+    font-size: 0.95rem;
+  }
+  
+  .contact-form .form-row {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-row--actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+  
+  .btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+  
+  .contact-info .contact-card {
+    padding: 1.5rem;
+  }
+  
+  .contact-info h3 {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+  
+  .info-list {
+    margin: 1.25rem 0;
+  }
+  
+  .info-list li {
+    font-size: 0.95rem;
+    padding: 0.4rem 0;
+  }
+  
+  .contact-form-note {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  
+  .message {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+  }
+}
