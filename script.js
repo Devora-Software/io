@@ -612,3 +612,4 @@ window.addEventListener('scroll', () => {
     window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(checkVisibility, 120); });
     window.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(checkVisibility, 120); });
   })();
+
