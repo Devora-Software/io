@@ -503,7 +503,7 @@ body {
   }
 
   .service-keypoints {
-    padding-left: 30%;
+    padding-left: 20%;
   }
 
   .service-keypoints li {
@@ -582,8 +582,25 @@ background: linear-gradient(316deg, #cedded9e, #cdcecf94);
   .social-icon source { width: 30px; height: 30px; }
 }
 
+@media (max-width: 768px) {
+  footer { 
+    padding: 0.2rem 1%; 
+  }
+
+  .footer-inner { 
+    gap: 0.1rem; 
+  }
+
+  .footer-copy { 
+    font-size: 0.6rem; 
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .social-icon img { transition: none !important; transform: none !important; }
+  .social-icon img { 
+    transition: none !important; 
+    transform: none !important; 
+  }
 }
 
 /* Projects carousel styles */
@@ -763,58 +780,85 @@ body {
   }
 }
 
-@media (max-width: 767px) {
+/* Tablet Styles (768px) for Projects Section */
+@media screen and (max-width: 768px) {
   .projects-carousel {
     padding: 0.5rem 0 1.5rem 0;
   }
   
   .projects-track {
-    gap: 1.5rem;
-    padding: 1rem 0.75rem;
+    gap: 1.2rem;
+    padding: 0.75rem 0.5rem;
   }
   
   .project-card {
     width: 85vw;
     min-width: 280px;
-    max-width: 350px;
+    max-width: 400px;
+    flex: 0 0 85%;
   }
   
   .project-card img {
-    height: 450px;
+    height: 300px;
+    border-radius: 10px;
   }
   
   .project-card__body {
-    padding: 1rem 1rem;
+    padding: 1rem 0.85rem;
+  }
+  
+  .project-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .project-card .muted {
+    font-size: 0.9rem;
+  }
+  
+  /* Adjust card scaling for tablet */
+  .project-card.is-center {
+    transform: scale(1.02);
+  }
+  
+  .project-card.is-left,
+  .project-card.is-right {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  
+  .project-points {
+    margin-top: 0.75rem;
+  }
+  
+  .project-point {
+    --size: 16px;
+  }
+  
+  .project-point::after {
+    width: 7px;
+    height: 7px;
   }
 }
 
+/* Additional optimization for smaller tablets */
+@media screen and (max-width: 680px) {
+  .project-card {
+    min-width: 260px;
+    flex: 0 0 88%;
+  }
+  
+  .project-card img {
+    height: 280px;
+  }
+  
+  .projects-track {
+    gap: 1rem;
+  }
+}
 @container (min-width: 768px) {
   .project-card {
     width: 65vw;
-  }
-}
-
-@media (max-width: 900px) {
-  .project-card { 
-    min-width: 88%; 
-    flex: 0 0 88%; 
-  }
-
-  .project-card img { 
-    height: 460px; 
-    border-radius: 10px; 
-  }
-
-  .project-card__body { 
-    padding: 0.85rem 1rem; 
-  }
-
-  .projects-track { 
-    padding: 0 0.75rem; 
-  }
-
-  .projects-carousel { 
-    padding-bottom: 1rem; 
   }
 }
 
