@@ -688,9 +688,6 @@ background: linear-gradient(316deg, #cedded9e, #cdcecf94);
   padding: 1rem 0 2rem 0;
   position: relative;
   container-type: inline-size;
-  margin: 0 auto;
-  left: 0;
-  right: 0;
 }
 
 .projects-track {
@@ -829,16 +826,16 @@ body {
   
   .projects-track {
     gap: 0.8rem;
-    padding: 0.5rem 1rem;
-    width: max-content;
-    margin: 0 auto;
+    padding: 0.5rem 0.75rem;
+    width: 100%; /* Changed from max-content to 100% */
+    max-width: 100%;
   }
   
   .project-card {
-    width: calc(100vw - 3rem); /* Account for padding */
+    width: 85vw;
     min-width: 280px;
     max-width: 300px;
-    flex: 0 0 auto;
+    flex: 0 0 85%;
   }
   
   .project-card img {
@@ -884,10 +881,6 @@ body {
     width: 6px;
     height: 6px;
   }
-
-  body {
-    overflow-x: hidden;
-  }
 }
 
 /* Tablet Styles (768px) for Projects Section */
@@ -898,16 +891,15 @@ body {
   
   .projects-track {
     gap: 1.2rem;
-    padding: 0.75rem 1.5rem;
-    width: max-content;
-    margin: 0 auto;
+    padding: 0.75rem 1rem;
+    width: 100%;
   }
   
   .project-card {
-    width: calc(100vw - 4rem);
+    width: 80vw;
     min-width: 300px;
     max-width: 400px;
-    flex: 0 0 auto;
+    flex: 0 0 80%;
   }
   
   .project-card img {
