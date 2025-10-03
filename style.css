@@ -89,8 +89,8 @@ body {
 
   .nav-links.active {
     display: flex;
-    width: 30%;
-    left: 70%;
+    width: 25%;
+    left: 75%;
   }
 
    .burger {
@@ -205,6 +205,7 @@ body {
     font-size: 0.95rem;
   }
 }
+
 /* Services Section */
 .services-grid {
   display: grid;
@@ -237,7 +238,6 @@ body {
   /* Professional keypoints styling */
   .service-keypoints {
     margin: 0;
-    padding-left: 1.1rem;
     color: #475569; /* muted slate */
     list-style: none; /* we'll add a custom marker */
     display: grid;
@@ -414,7 +414,11 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .services-list .service-row,
-  .services-list.is-revealed .service-row { transition: none !important; transform: none !important; opacity: 1 !important; }
+  .services-list.is-revealed .service-row { 
+    transition: none !important; 
+    transform: none !important; 
+    opacity: 1 !important; 
+  }
 }
 
 /* Variants: text left / text right */
@@ -450,6 +454,78 @@ body {
   }
 }
 
+/* Tablet Styles (768px) for Services Section */
+@media screen and (max-width: 768px) {
+  .services-list {
+    gap: 2rem;
+  }
+
+  .section-title {
+    font-size: 2.8rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .service-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    text-align: left;
+    /* Ensure content comes first in DOM order */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-row--left::before {
+    width: 4px;
+  }
+
+  .service-row__content {
+    order: 1; /* Content comes first */
+  }
+
+  .service-row__media {
+    order: 2; /* Image comes after content */
+  }
+
+  .service-row__content h3 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .service-row__content p {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .service-subhead {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .service-keypoints {
+    padding-left: 30%;
+  }
+
+  .service-keypoints li {
+    font-size: 0.92rem;
+    padding-left: 1rem;
+  }
+
+  .service-row__media img {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Reset any right-aligned text on mobile */
+  .service-row--right .service-row__content {
+    text-align: left;
+  }
+
+  /* Ensure all content is left-aligned on mobile */
+  .service-row__content {
+    text-align: left !important;
+  }
+}
 
 /* Footer styles */
 footer {
